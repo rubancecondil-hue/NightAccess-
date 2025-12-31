@@ -1,11 +1,17 @@
+import fs from "fs";
+import path from "path";
+
 export default function handler(req, res) {
   const slug = req.query.slug;
 
-  if (slug === "google") {
-    res.writeHead(302, { Location: "https://google.com" });
-    res.end();
+  const filePath = path.join(process.cwd(), "data", "links.json");
+  const links = JSON.parse(fs.readFileSync(filePath, "utf8"));
+
+  if (!links[slug]) {
+    res.status(404).send("Link not found");
     return;
   }
 
-  res.status(404).send("Link not found");
+  res.writeHead(302, { Location: links[slug] });
+  res.end();
 }
